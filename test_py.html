@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DuckDB in Browser</title>
+</head>
+<body>
+  <h1>DuckDB Queries</h1>
+  <div id="results"></div>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/nightly/pyodide.js"></script>
+  <script>
+    async function runDuckDBQuery() {
+      const pyodide = await loadPyodide(); // Load Pyodide
+      await pyodide.loadPackagesFromList(['duckdb']); // Load duckdb package
+
+      const pythonCode = `
+        import duckdb
+        conn = duckdb.connect("nyc_parking_violations.db")
+
+        # Load data from a CSV file (replace with your actual file)
+        conn.execute("COPY data FROM 'data/your_data.csv' (HEADER=TRUE)")
+
+        # Execute a query
+        result = conn.execute("SELECT manhattan_96th_st_below, count(*) as num_rows FROM first_model group by manhattan_96th_st_below").df()
+
+        print(result)
+      `;
+
+      await pyodide.run(pythonCode);
+
+      // Get the results from the Python code
+      const results = await pyodide.run("result");
+
+      // Display the results in the browser
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = results;
+    }
+
+    runDuckDBQuery();
+  </script>
+</body>
+</html>
