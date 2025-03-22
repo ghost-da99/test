@@ -11,7 +11,7 @@
         async function loadDatabase() {
             // Initialize DuckDB-WASM
             const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
-            const worker = new bundle.MainWorker();
+            const worker = await duckdb.createWorker(bundle.mainWorker);
             const db = new duckdb.AsyncDuckDB();
             await db.instantiate(worker);
 
