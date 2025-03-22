@@ -8,13 +8,20 @@
     <script type="module">
         import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.26.0/+esm";
         //import * as duckdb from "@duckdb/duckdb-wasm"
-        
+
+        function getWorkerURL( url ) {
+          const content = `importScripts( "${ url }" );`;
+          return URL.createObjectURL( new Blob( [ content ], { type: "text/javascript" } ) );
+        }
         async function loadDatabase() {
             // Initialize DuckDB-WASM
             const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
             const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
-
-            const worker = new Worker(bundle.mainWorker);
+            const worker_url = getWorkerURL( "https://greggman.github.io/doodles/test/ping-worker.js" );
+            const worker = new Worker( worker_url );
+            worker.onmessage = (evt) => console.log( evt.data );
+            URL.revokeObjectURL( worker_url );
+            //const worker = new Worker(bundle.mainWorker);
             const logger = new duckdb.ConsoleLogger();
             
             const db = new duckdb.AsyncDuckDB(logger, worker);
