@@ -6,12 +6,17 @@
     <title>DuckDB + D3.js Chart</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script type="module">
-        import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.26.0/+esm";
+        //import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.26.0/+esm";
+        import * as duckdb from "@duckdb/duckdb-wasm"
         
         async function loadDatabase() {
             // Initialize DuckDB-WASM
             const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
-            const worker = await duckdb.createWorker(bundle.mainWorker);
+            //const worker = await duckdb.createWorker(bundle.mainWorker);
+            const allBundles = duckdb.getJsDelivrBundles();
+            const bestBundle = await duckdb.selectBundle(allBundles);
+            const worker = await duckdb.createWorker(bestBundle.mainWorker);
+            
             const db = new duckdb.AsyncDuckDB();
             await db.instantiate(worker);
 
