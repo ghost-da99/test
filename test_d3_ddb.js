@@ -1,6 +1,6 @@
 // Function to fetch data from DuckDB
 async function fetchData() {
-    const response = await fetch('https://github.com/da947e_ATT/da947e_sandbox/blob/main/data/nyc_parking_violations.db', {
+    const response = await fetch('https://github.com/ghost-da99/test/blob/main/nyc_parking_violations.db', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
