@@ -1,70 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DuckDB + D3.js Chart</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <script type="module">
-        import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.26.0/+esm";
-        //import * as duckdb from "@duckdb/duckdb-wasm"
-
-        function getWorkerURL( url ) {
-          const content = `importScripts( "${ url }" );`;
-          return URL.createObjectURL( new Blob( [ content ], { type: "text/javascript" } ) );
-        }
-        async function loadDatabase() {
-            // Initialize DuckDB-WASM
-            const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
-            const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
-            const worker_url = getWorkerURL( "https://greggman.github.io/doodles/test/ping-worker.js" );
-            const worker = new Worker( worker_url );
-            worker.onmessage = (evt) => console.log( evt.data );
-            URL.revokeObjectURL( worker_url );
-            //const worker = new Worker(bundle.mainWorker);
-            const logger = new duckdb.ConsoleLogger();
-            
-            const db = new duckdb.AsyncDuckDB(logger, worker);
-            await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-            URL.revokeObjectURL(worker_url);
-
-            // Load the database file
-            const res = await fetch("nyc_parking_violations.db"); 
-            const buffer = await res.arrayBuffer();
-            await db.registerFileBuffer("nyc_parking_violations.db", new Uint8Array(buffer));
-            const conn = await db.connect();
-
-            // Run a query (Modify based on your table structure)
-            const result = await conn.query("SELECT manhattan_96th_st_below, count(*) as num_rows FROM first_model group by manhattan_96th_st_below");
-            const data = result.toArray().map(row => ({ category: row[0], value: row[1] }));
-
-            drawChart(data);
-        }
-
-        function drawChart(data) {
-            const width = 500, height = 300, margin = { top: 20, right: 20, bottom: 30, left: 40 };
-            const svg = d3.select("body").append("svg")
-                .attr("width", width)
-                .attr("height", height);
-
-            const x = d3.scaleBand().domain(data.map(d => d.category)).range([margin.left, width - margin.right]).padding(0.1);
-            const y = d3.scaleLinear().domain([0, d3.max(data, d => d.value)]).nice().range([height - margin.bottom, margin.top]);
-
-            svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x));
-            svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
-
-            svg.selectAll("rect").data(data).enter().append("rect")
-                .attr("x", d => x(d.category))
-                .attr("y", d => y(d.value))
-                .attr("height", d => y(0) - y(d.value))
-                .attr("width", x.bandwidth())
-                .attr("fill", "steelblue");
-        }
-
-        loadDatabase();
-    </script>
-</head>
-<body>
-    <h1>DuckDB + D3.js Chart</h1>
-</body>
-</html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <title>Simple D3.js Bar Chart with DuckDB Data</title>
+     <script src="https://d3js.org/d3.v7.min.js"></script>
+ </head>
+ <body>
+     <h1>Bar Chart using D3.js and DuckDB</h1>
+     <div id="chart"></div>
+     <script src="test_d3_ddb.js"></script>
+ </body>
+ </html>
