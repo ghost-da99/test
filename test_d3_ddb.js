@@ -1,6 +1,7 @@
 // Function to fetch data from DuckDB
 async function fetchData() {
     const response = await fetch('https://github.com/ghost-da99/test/blob/main/nyc_parking_violations.db', {
+        mode: 'no-cors',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
